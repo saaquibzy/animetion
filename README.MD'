@@ -1,0 +1,113 @@
+# Cartoon Reels Automation Pipeline
+
+This project automates the generation and posting of cartoon-style Instagram Reels using AI services. It runs as a cloud Python pipeline on Render (or alternatives).
+
+## Features
+
+- **Script generation** using OpenAI or GPT4All
+- **Cartoon face/image generation** via Hugging Face Stable Diffusion API
+- **Voice synthesis** via Coqui TTS (Hugging Face API)
+- **Animation** (talking head video) via SadTalker or Wav2Lip
+- **Video merging** using MoviePy
+- **Automated posting** to Instagram Reels via Instagram Graph API
+
+---
+
+## Folder Structure
+
+```
+characters/         # (Optional) Your own custom cartoon images
+generated_faces/    # AI-generated cartoon faces
+voices/             # Voice audio files (TTS-generated)
+animations/         # Talking head video clips
+videos/             # Final merged videos for upload
+```
+
+---
+
+## Setup
+
+1. **Clone the repository** or upload these files to Render/Replit.
+2. **Create a `requirements.txt`** with:
+    ```
+    openai
+    requests
+    moviepy
+    ```
+    *(Add `flask` if you want a web interface.)*
+3. **Create a `config.py`** and fill in your API keys and tokens:
+    ```python
+    OPENAI_API_KEY = "your-openai-api-key"
+    HF_TOKEN = "your-huggingface-token"
+    IG_USER_ID = "your-instagram-user-id"
+    ACCESS_TOKEN = "your-instagram-long-lived-access-token"
+    ```
+4. **Deploy as a Background Worker** if using Render, or run locally:
+    ```
+    python app.py
+    ```
+5. **The script will create all required folders automatically.**
+
+---
+
+## How It Works
+
+1. **Script Generation:**  
+   Uses OpenAI (or similar) to create a short cartoon script or dialogue.
+
+2. **Face Generation:**  
+   Sends prompts to a Hugging Face Stable Diffusion API to generate cartoon character faces.
+
+3. **Voice Synthesis:**  
+   Uses Coqui TTS (or similar) to generate speech audio for each script line.
+
+4. **Animation:**  
+   Animates the face images to the speech audio using SadTalker or Wav2Lip (API on Hugging Face Spaces).
+
+5. **Video Merging:**  
+   Combines the animated clips into a single video using MoviePy.
+
+6. **Instagram Posting:**  
+   Uploads the final video to Instagram Reels using the Instagram Graph API.
+
+---
+
+## Customization
+
+- Change prompts for your desired cartoon styles.
+- Replace or add your own character images in `characters/`.
+- Adapt the script for multiple characters or more complex scenes.
+
+---
+
+## Notes
+
+- **API quotas:** Free tiers may have limits.
+- **Instagram API:** You must use a business/creator IG account and set up a Facebook App for automated posting.
+- **Video Uploads:** Video files must be accessible via a public URL for Instagram API uploads.
+
+---
+
+## Troubleshooting
+
+- If Render gives a port error, deploy as a **Background Worker** (not a Web Service).
+- Make sure all API keys and tokens are valid and set in `config.py`.
+- Check Hugging Face Space API docs for model-specific parameters.
+
+---
+
+## Credits
+
+- [OpenAI](https://platform.openai.com/)
+- [Hugging Face Spaces](https://huggingface.co/spaces)
+- [Coqui TTS](https://coqui.ai/)
+- [SadTalker](https://github.com/Winfredy/SadTalker) / [Wav2Lip](https://github.com/Rudrabha/Wav2Lip)
+- [MoviePy](https://zulko.github.io/moviepy/)
+- [Instagram Graph API](https://developers.facebook.com/docs/instagram-api)
+
+---
+
+## License
+
+This project is for educational and non-commercial use.  
+APIs/services used may have their own licenses and restrictions.
