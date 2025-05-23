@@ -1,8 +1,12 @@
-# Fill in your own values here
-OPENAI_API_KEY = "your-openai-api-key"
-HF_TOKEN = "your-huggingface-token"
-APP_ID = "your-facebook-app-id"
-APP_SECRET = "your-facebook-app-secret"
-IG_USER_ID = "your-instagram-user-id"
-ACCESS_TOKEN = "your-instagram-long-lived-access-token"
-PAGE_ID = "your-facebook-page-id"
+import os
+from dotenv import load_dotenv
+
+load_dotenv()  # Load environment variables from .env file
+
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+HF_TOKEN = os.getenv("HF_TOKEN")
+APP_ID = os.getenv("APP_ID")
+APP_SECRET = os.getenv("APP_SECRET")
+IG_USER_ID = os.getenv("IG_USER_ID")
+ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
+PAGE_ID = os.getenv("PAGE_ID")
