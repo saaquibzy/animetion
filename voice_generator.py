@@ -1,26 +1,32 @@
-# voice_generator.py
-
 import os
 import requests
-from config import ELEVENLABS_API_KEY, CHARACTER_VOICE_MAP, VOICES_DIR
+from config import CHARACTER_VOICE_MAP, VOICES_DIR
 
-def tts_elevenlabs(character, text, filename):
-    voice_id = CHARACTER_VOICE_MAP.get(character.lower(), CHARACTER_VOICE_MAP["narrator"])
-    url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
-    headers = {
-        "xi-api-key": ELEVENLABS_API_KEY,
-        "Content-Type": "application/json"
-    }
-    data = {
-        "text": text,
-        "voice_settings": {"stability": 0.75, "similarity_boost": 0.75}
-    }
-    response = requests.post(url, headers=headers, json=data)
-    with open(os.path.join(VOICES_DIR, filename), "wb") as f:
-        f.write(response.content)
+def tts_hf_suno(character, text, filename):
+    """
+    Generate speech using Hugging Face Suno TTS Space.
+    Args:
+        character (str): Character name (used for speaker selection if needed)
+        text (str): Text to be synthesized
+        filename (str): Output WAV file name
+    """
+    speaker = "female" if character.lower() not in ["narrator", "male"] else "male"
+    url = "https://suno-tts.hf.space/run/predict"
+    payload = {"data": [text, speaker]}
+    try:
+        response = requests.post(url, json=payload, timeout=60)
+        response.raise_for_status()
+        audio_url = response.json()["data"][0]
+        audio = requests.get(audio_url)
+        out_path = os.path.join(VOICES_DIR, filename)
+        with open(out_path, "wb") as f:
+            f.write(audio.content)
+        print(f"Generated voice for {character}: {filename}")
+    except Exception as e:
+        print(f"Error generating voice for {character}: {e}")
 
 def parse_script(script_path):
-    # Very basic: expects lines like "CHARACTER: dialogue"
+    # Expects lines like "CHARACTER: dialogue"
     lines = []
     with open(script_path, "r", encoding="utf-8") as f:
         for idx, line in enumerate(f):
@@ -33,6 +39,5 @@ if __name__ == "__main__":
     os.makedirs(VOICES_DIR, exist_ok=True)
     script_lines = parse_script("script.txt")
     for character, dialogue, idx in script_lines:
-        filename = f"{character.lower()}_line{idx+1}.mp3"
-        tts_elevenlabs(character, dialogue, filename)
-        print(f"Generated voice for {character}, line {idx+1}")
+        filename = f"{character.lower()}_line{idx+1}.wav"
+        tts_hf_suno(character, dialogue, filename)

@@ -1,9 +1,10 @@
 import os
 import sys
 from config import (
-    OPENAI_API_KEY, HF_TOKEN, COQUI_API_KEY,
+    OPENAI_API_KEY, HF_TOKEN,
     APP_ID, APP_SECRET, IG_USER_ID, ACCESS_TOKEN, PAGE_ID
 )
+import requests
 
 # 1. Ensure folders exist
 folders = ["characters", "generated_faces", "voices", "animations", "videos"]
@@ -42,14 +43,25 @@ def generate_face(script_text):
         f.write(b"PLACEHOLDER_IMAGE_DATA")
     return face_path
 
-# 4. Voice Generation (Coqui TTS API call - placeholder)
-def generate_voice(script_text):
-    # TODO: Replace with Coqui TTS cloud API call
-    print("🔊 Generating voice (placeholder)...")
-    voice_path = "voices/voice1.mp3"
-    with open(voice_path, "wb") as f:
-        f.write(b"PLACEHOLDER_AUDIO_DATA")
-    return voice_path
+# 4. Voice Generation (Hugging Face Suno TTS)
+def generate_voice(script_text, out_path="voices/voice1.wav", speaker="female"):
+    url = "https://suno-tts.hf.space/run/predict"
+    payload = {"data": [script_text, speaker]}
+    try:
+        response = requests.post(url, json=payload, timeout=60)
+        response.raise_for_status()
+        audio_url = response.json()["data"][0]
+        audio = requests.get(audio_url)
+        with open(out_path, "wb") as f:
+            f.write(audio.content)
+        print(f"🔊 Voice generated and saved to {out_path}")
+        return out_path
+    except Exception as e:
+        print("Error generating voice:", e)
+        # fallback placeholder
+        with open(out_path, "wb") as f:
+            f.write(b"PLACEHOLDER_AUDIO_DATA")
+        return out_path
 
 # 5. Animation (SadTalker or Wav2Lip API call - placeholder)
 def animate_face(face_path, voice_path):
